@@ -53,12 +53,12 @@ enum Event : uint8_t {
 /// Creation of D-V0 pairs
 struct HfDataCreatorDV0Reduced {
   // Produces AOD tables to store track information
-  Produces<aod::StraCollisions> lfReducedCollision; //Defined in PWGLF/DataModel/LFStrangenessTables.h
+  Produces<aod::StraCollisions> lfReducedCollision;  // Defined in PWGLF/DataModel/LFStrangenessTables.h
   Produces<aod::HfOrigColCounts> hfCollisionCounter; // Defined in PWGHF/D2H/DataModel/ReducedDataModel.h
-  Produces<aod::HfRedVzeros> hfCandV0; // Defined in PWGHF/D2H/DataModel/ReducedDataModel.h
-  Produces<aod::HfRedD> hfCandD; // Defined in PWGHF/D2H/DataModel/ReducedDataModel.h
+  Produces<aod::HfRedVzeros> hfCandV0;               // Defined in PWGHF/D2H/DataModel/ReducedDataModel.h
+  Produces<aod::HfRedD> hfCandD;                     // Defined in PWGHF/D2H/DataModel/ReducedDataModel.h
 
-  // selection  
+  // selection
   Configurable<int> selectionFlagD{"selectionFlagD", 7, "Selection Flag for D"};
 
   HfHelper hfHelper;
@@ -120,14 +120,14 @@ struct HfDataCreatorDV0Reduced {
 
       for (const auto& v0 : V0s) {
         std::array<float, 3> pVecV0 = {v0.pxpos() + v0.pxneg(), v0.pypos() + v0.pyneg(), v0.pzpos() + v0.pzneg()};
-        float ptV0 = sqrt(pVecV0[0]*pVecV0[0] + pVecV0[1]*pVecV0[1]);
+        float ptV0 = sqrt(pVecV0[0] * pVecV0[0] + pVecV0[1] * pVecV0[1]);
         auto invMass2DV0 = RecoDecay::m2(std::array{pVecD, pVecV0}, std::array{MassDPlus, MassK0Short});
         registry.fill(HIST("hMassDs1"), sqrt(invMass2DV0));
-     
+
         // fill V0 table
         // if information on V0 already stored, go to next V0
         if (!selectedV0s.count(v0.globalIndex())) {
-          hfCandV0(v0.posTrackId(), v0.negTrackId(), 
+          hfCandV0(v0.posTrackId(), v0.negTrackId(),
                    indexHfReducedCollision,
                    v0.x(), v0.y(), v0.z(),
                    v0.mK0Short(),
@@ -138,13 +138,13 @@ struct HfDataCreatorDV0Reduced {
         }
         fillHfCandD = true;
       } // V0 loop
-      
+
       if (fillHfCandD) { // fill candDplus table only once per D candidate, only if at least one V0 is found
         hfCandD(candD.prong0Id(), candD.prong1Id(), candD.prong2Id(),
                 indexHfReducedCollision,
                 candD.xSecondaryVertex(), candD.ySecondaryVertex(), candD.zSecondaryVertex(),
                 invMassD,
-                pVecD[0],pVecD[1],pVecD[2]);
+                pVecD[0], pVecD[1], pVecD[2]);
         fillHfReducedCollision = true;
         registry.fill(HIST("hMassDToPiKPi"), invMassD);
         registry.fill(HIST("hPtD"), candD.pt());
