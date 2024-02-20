@@ -371,11 +371,11 @@ DECLARE_SOA_TABLE(HfCandBpConfigs, "AOD", "HFCANDBPCONFIG", //! Table with confi
                   hf_cand_bplus_config::MySelectionFlagD0bar,
                   hf_cand_bplus_config::MyInvMassWindowD0Pi);
 
-//Charm resonances analysis
+// Charm resonances analysis
 namespace hf_reso_cand_reduced
 {
-DECLARE_SOA_COLUMN(InvMass, invMass, float);      //! Invariant mass of V0/D candidate in GeV/c2
-DECLARE_SOA_COLUMN(Px, px, float);                //! Momentum of V0/D candidate in GeV/c          
+DECLARE_SOA_COLUMN(InvMass, invMass, float); //! Invariant mass of V0/D candidate in GeV/c2
+DECLARE_SOA_COLUMN(Px, px, float);           //! Momentum of V0/D candidate in GeV/c
 DECLARE_SOA_COLUMN(Py, py, float);
 DECLARE_SOA_COLUMN(Pz, pz, float);
 } // namespace hf_reso_cand_reduced
@@ -399,9 +399,7 @@ DECLARE_SOA_TABLE(HfRedD, "AOD", "HFREDD", //! Table with D+/D* candidate inform
                   hf_reso_cand_reduced::Px,
                   hf_reso_cand_reduced::Py,
                   hf_reso_cand_reduced::Pz);
-                  } // namespace aod
-
-
+} // namespace aod
 
 namespace soa
 {
