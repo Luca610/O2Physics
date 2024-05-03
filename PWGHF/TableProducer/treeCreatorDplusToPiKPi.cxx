@@ -93,8 +93,13 @@ DECLARE_SOA_TABLE(HfCandDpLites, "AOD", "HFCANDDPLITE",
                   hf_cand::ImpactParameter0,
                   hf_cand::ImpactParameter1,
                   hf_cand::ImpactParameter2,
+<<<<<<< HEAD
                   hf_cand::ImpactParameterZ0, 
                   hf_cand::ImpactParameterZ1, 
+=======
+                  hf_cand::ImpactParameterZ0,
+                  hf_cand::ImpactParameterZ1,
+>>>>>>> 6255cbe3e0fbc18354e0d60af765ae329efdf93f
                   hf_cand::ImpactParameterZ2,
                   full::NSigTpcPi0,
                   full::NSigTpcKa0,
@@ -167,11 +172,19 @@ DECLARE_SOA_TABLE(HfCandDpFulls, "AOD", "HFCANDDPFULL",
                   hf_cand::ErrorImpactParameter0,
                   hf_cand::ErrorImpactParameter1,
                   hf_cand::ErrorImpactParameter2,
+<<<<<<< HEAD
                   hf_cand::ImpactParameterZ0, 
                   hf_cand::ImpactParameterZ1, 
                   hf_cand::ImpactParameterZ2,
                   hf_cand::ErrorImpactParameterZ0, 
                   hf_cand::ErrorImpactParameterZ1, 
+=======
+                  hf_cand::ImpactParameterZ0,
+                  hf_cand::ImpactParameterZ1,
+                  hf_cand::ImpactParameterZ2,
+                  hf_cand::ErrorImpactParameterZ0,
+                  hf_cand::ErrorImpactParameterZ1,
+>>>>>>> 6255cbe3e0fbc18354e0d60af765ae329efdf93f
                   hf_cand::ErrorImpactParameterZ2,
                   full::NSigTpcPi0,
                   full::NSigTpcKa0,
@@ -496,7 +509,7 @@ struct HfTreeCreatorDplusToPiKPi {
         particle.pt(),
         particle.eta(),
         particle.phi(),
-        RecoDecay::y(std::array{particle.px(), particle.py(), particle.pz()}, o2::constants::physics::MassDPlus),
+        RecoDecay::y(particle.pVector(), o2::constants::physics::MassDPlus),
         particle.flagMcMatchGen(),
         particle.originMcGen());
     }

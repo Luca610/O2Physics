@@ -93,8 +93,8 @@ struct nuclei_in_jets {
   Configurable<float> min_pt{"min_pt", 0.2f, "minimum pt of the tracks"};
   Configurable<float> min_eta{"min_eta", -0.8f, "minimum eta"};
   Configurable<float> max_eta{"max_eta", +0.8f, "maximum eta"};
-  Configurable<float> min_y{"min_y", -5.0f, "minimum y"};
-  Configurable<float> max_y{"max_y", +5.0f, "maximum y"};
+  Configurable<float> min_y{"min_y", -0.5f, "minimum y"};
+  Configurable<float> max_y{"max_y", +0.5f, "maximum y"};
   Configurable<float> max_dcaxy{"max_dcaxy", 0.1f, "Maximum DCAxy"};
   Configurable<float> max_dcaz{"max_dcaz", 0.1f, "Maximum DCAz"};
   Configurable<float> min_nsigmaTPC{"min_nsigmaTPC", -3.0f, "Minimum nsigma TPC"};
@@ -194,11 +194,17 @@ struct nuclei_in_jets {
     registryMC.add("antiproton_dca_prim", "antiproton_dca_prim", HistType::kTH2F, {{100, 0.0, 5.0, "#it{p}_{T} (GeV/#it{c})"}, {200, -0.5, 0.5, "DCA_{xy} (cm)"}});
     registryMC.add("antiproton_dca_sec", "antiproton_dca_sec", HistType::kTH2F, {{100, 0.0, 5.0, "#it{p}_{T} (GeV/#it{c})"}, {200, -0.5, 0.5, "DCA_{xy} (cm)"}});
 
+    // Fraction of Primary Antiprotons from MC
+    registryMC.add("antiproton_prim", "antiproton_prim", HistType::kTH1F, {{100, 0.0, 5.0, "#it{p}_{T} (GeV/#it{c})"}});
+    registryMC.add("antiproton_all", "antiproton_all", HistType::kTH1F, {{100, 0.0, 5.0, "#it{p}_{T} (GeV/#it{c})"}});
+
     // Histograms for reweighting
     registryMC.add("antiproton_eta_pt_pythia", "antiproton_eta_pt_pythia", HistType::kTH2F, {{100, 0.0, 5.0, "#it{p}_{T} (GeV/#it{c})"}, {80, -0.8, 0.8, "#eta"}});
-    registryMC.add("antideuteron_eta_pt", "antideuteron_eta_pt", HistType::kTH2F, {{100, 0.0, 5.0, "#it{p}_{T} (GeV/#it{c})"}, {80, -0.8, 0.8, "#eta"}});
     registryMC.add("antiproton_eta_pt_jet", "antiproton_eta_pt_jet", HistType::kTH2F, {{100, 0.0, 5.0, "#it{p}_{T} (GeV/#it{c})"}, {80, -0.8, 0.8, "#eta"}});
     registryMC.add("antiproton_eta_pt_ue", "antiproton_eta_pt_ue", HistType::kTH2F, {{100, 0.0, 5.0, "#it{p}_{T} (GeV/#it{c})"}, {80, -0.8, 0.8, "#eta"}});
+    registryMC.add("antideuteron_eta_pt_injected", "antideuteron_eta_pt_injected", HistType::kTH2F, {{100, 0.0, 5.0, "#it{p}_{T} (GeV/#it{c})"}, {80, -0.8, 0.8, "#eta"}});
+    registryMC.add("antideuteron_eta_pt_jet", "antideuteron_eta_pt_jet", HistType::kTH2F, {{100, 0.0, 5.0, "#it{p}_{T} (GeV/#it{c})"}, {80, -0.8, 0.8, "#eta"}});
+    registryMC.add("antideuteron_eta_pt_ue", "antideuteron_eta_pt_ue", HistType::kTH2F, {{100, 0.0, 5.0, "#it{p}_{T} (GeV/#it{c})"}, {80, -0.8, 0.8, "#eta"}});
   }
 
   // Single-Track Selection for the Particle of Interest
@@ -885,7 +891,7 @@ struct nuclei_in_jets {
         if (particle.pdgCode() == -1000010020) {
           registryMC.fill(HIST("antideuteron_jet_gen"), particle.pt(), wde_jet);
           registryMC.fill(HIST("antideuteron_ue_gen"), particle.pt(), wde_ue);
-          registryMC.fill(HIST("antideuteron_eta_pt"), particle.pt(), particle.eta());
+          registryMC.fill(HIST("antideuteron_eta_pt_injected"), particle.pt(), particle.eta());
         }
         if (particle.pdgCode() == -1000020030) {
           registryMC.fill(HIST("antihelium3_jet_gen"), particle.pt(), whe_jet);
@@ -895,7 +901,7 @@ struct nuclei_in_jets {
     }
   }
 
-  void processRec(SimCollisions const& collisions, MCTracks const& mcTracks, aod::McCollisions const& /*mcCollisions*/, const aod::McParticles& /*mcParticles*/)
+  void processRec(SimCollisions const& collisions, MCTracks const& mcTracks, aod::McCollisions const&, const aod::McParticles&)
   {
 
     for (const auto& collision : collisions) {
@@ -960,13 +966,21 @@ struct nuclei_in_jets {
         if (particle.pdgCode() == -2212 && (!particle.isPhysicalPrimary()) && TMath::Abs(track.dcaZ()) < max_dcaz)
           registryMC.fill(HIST("antiproton_dca_sec"), pt, track.dcaXY());
 
-        if (!particle.isPhysicalPrimary())
-          continue;
-
         // DCA Cuts
         if (TMath::Abs(track.dcaXY()) > max_dcaxy)
           continue;
         if (TMath::Abs(track.dcaZ()) > max_dcaz)
+          continue;
+
+        // Fraction of Primary Antiprotons
+        if (particle.pdgCode() == -2212) {
+          registryMC.fill(HIST("antiproton_all"), pt);
+          if (particle.isPhysicalPrimary()) {
+            registryMC.fill(HIST("antiproton_prim"), pt);
+          }
+        }
+
+        if (!particle.isPhysicalPrimary())
           continue;
 
         // Antiproton
@@ -1004,8 +1018,8 @@ struct nuclei_in_jets {
     }
   }
 
-  void processWeights(o2::aod::McCollisions const& mcCollisions,
-                      aod::McParticles const& mcParticles)
+  void processAntipJet(o2::aod::McCollisions const& mcCollisions,
+                       aod::McParticles const& mcParticles)
   {
 
     for (const auto& mccollision : mcCollisions) {
@@ -1027,13 +1041,24 @@ struct nuclei_in_jets {
       // Generated Particles
       for (auto& particle : mcParticles_per_coll) {
 
-        if (!particle.isPhysicalPrimary())
-          continue;
-        if (particle.pdgCode() != -2212)
-          continue;
-
         // Index
         i++;
+
+        // Select Primary Particles
+        float deltaX = particle.vx() - mccollision.posX();
+        float deltaY = particle.vy() - mccollision.posY();
+        float deltaZ = particle.vz() - mccollision.posZ();
+        float deltaR = sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+        if (deltaR > 0.1)
+          continue;
+
+        if (abs(particle.eta()) > 0.8)
+          continue;
+
+        // PDG Selection
+        int pdg = abs(particle.pdgCode());
+        if ((pdg != 11) && (pdg != 211) && (pdg != 321) && (pdg != 2212))
+          continue;
 
         // Find pt Leading
         if (particle.pt() > pt_max) {
@@ -1195,6 +1220,9 @@ struct nuclei_in_jets {
         if (R > Rmax_jet_ue)
           continue;
 
+        if (jet_track.pdgCode() != -2212)
+          continue;
+
         registryMC.fill(HIST("antiproton_eta_pt_jet"), jet_track.pt(),
                         jet_track.eta());
       }
@@ -1202,6 +1230,8 @@ struct nuclei_in_jets {
       for (int i = 0; i < nParticlesUE; i++) {
 
         const auto& ue_track = mcParticles_per_coll.iteratorAt(ue_particle_ID[i]);
+        if (ue_track.pdgCode() != -2212)
+          continue;
         registryMC.fill(HIST("antiproton_eta_pt_ue"), ue_track.pt(),
                         ue_track.eta());
       }
@@ -1210,7 +1240,7 @@ struct nuclei_in_jets {
 
   PROCESS_SWITCH(nuclei_in_jets, processGen, "process Gen MC", false);
   PROCESS_SWITCH(nuclei_in_jets, processRec, "process Rec MC", false);
-  PROCESS_SWITCH(nuclei_in_jets, processWeights, "process Weights MC", false);
+  PROCESS_SWITCH(nuclei_in_jets, processAntipJet, "process antiprotons in jet and UE (MC)", false);
 };
 
 WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)

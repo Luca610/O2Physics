@@ -40,7 +40,7 @@ struct MultiplicityExtraTable {
   int newRunNumber = -999;
   int oldRunNumber = -999;
 
-  void init(InitContext& context)
+  void init(InitContext&)
   {
     ccdbApi.init("http://alice-ccdb.cern.ch");
     ccdb->setURL("http://alice-ccdb.cern.ch");
@@ -50,7 +50,7 @@ struct MultiplicityExtraTable {
 
   using BCsWithRun3Matchings = soa::Join<aod::BCs, aod::Timestamps, aod::Run3MatchedToBCSparse>;
 
-  void process(BCsWithRun3Matchings::iterator const& bc, aod::FV0As const&, aod::FT0s const& ft0s, aod::FDDs const&, aod::Zdcs const&)
+  void process(BCsWithRun3Matchings::iterator const& bc, aod::FV0As const&, aod::FT0s const&, aod::FDDs const&, aod::Zdcs const&)
   {
     bool Tvx = false;
     bool isFV0OrA = false;
@@ -78,15 +78,11 @@ struct MultiplicityExtraTable {
     int localBC = bc.globalBC() % nBCsPerOrbit;
 
     if (newRunNumber != oldRunNumber) {
-      uint64_t ts{};
-      std::map<string, string> metadataRCT, headers;
-      headers = ccdbApi.retrieveHeaders(Form("RCT/Info/RunInformation/%i", newRunNumber), metadataRCT, -1);
-      ts = atol(headers["SOR"].c_str());
+      auto soreor = o2::ccdb::BasicCCDBManager::getRunDuration(ccdbApi, newRunNumber);
+      auto ts = soreor.first;
 
       LOG(info) << " newRunNumber  " << newRunNumber << " time stamp " << ts;
       oldRunNumber = newRunNumber;
-      std::map<std::string, std::string> mapMetadata;
-      std::map<std::string, std::string> mapHeader;
       auto grplhcif = ccdb->getForTimeStamp<o2::parameters::GRPLHCIFData>("GLO/Config/GRPLHCIF", ts);
       CollidingBunch = grplhcif->getBunchFilling().getBCPattern();
     } // new run number
