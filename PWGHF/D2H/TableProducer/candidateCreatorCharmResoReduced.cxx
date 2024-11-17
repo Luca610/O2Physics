@@ -700,7 +700,7 @@ struct HfCandidateCreatorCharmResoReducedExpressions {
         break;
       }
       if (!filledMcInfo) { // protection to get same size tables in case something went wrong: we created a candidate that was not preselected in the D-Pi creator
-        // rowResoMcRec(0, -1, -1, -1.f);
+        rowResoMcRec(0, -1, -1, -1.f);
         registry.fill(HIST("hMassMcNoEntry"), candReso.invMass(), candReso.pt());
       }
     }
