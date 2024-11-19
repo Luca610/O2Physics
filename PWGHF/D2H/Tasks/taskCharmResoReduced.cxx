@@ -262,7 +262,7 @@ struct HfTaskCharmResoReduced {
         if (channel == DecayChannel::Ds1ToDstarK0s && !(std::abs(flagMcMatchRec) == DecayTypeMc::Ds1ToDStarK0ToD0PiK0s || std::abs(flagMcMatchRec) == DecayTypeMc::Ds1ToDStarK0ToD0PiK0sPart || std::abs(flagMcMatchRec) == DecayTypeMc::Ds1ToDStarK0ToD0NoPiK0sPart || std::abs(flagMcMatchRec) == DecayTypeMc::Ds1ToDStarK0ToD0PiK0sOneMu)) {
           return;
         }
-        if (channel == DecayChannel::Ds2StarToDplusK0s && !(std::abs(flagMcMatchRec) == DecayTypeMc::Ds2StarToDplusK0sToPiKaPiPiPi || std::abs(flagMcMatchRec) == DecayTypeMc::Ds1ToDStarK0ToDPlusPi0K0s || std::abs(flagMcMatchRec) == DecayTypeMc::Ds2StarToDplusK0sOneMu)) {
+        if (channel == DecayChannel::Ds2StarToDplusK0s && !(std::abs(flagMcMatchRec) == DecayTypeMc::Ds2StarToDplusK0sToPiKaPiPiPi ||  std::abs(flagMcMatchRec) == DecayTypeMc::Ds2StarToDplusK0sOneMu)) {
           return;
         }
       }
